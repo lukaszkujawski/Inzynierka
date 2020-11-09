@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="280">
+    <clipPath id="cut-off1">
+        <rect x="0" y="0" width="90" height="280" />
+    </clipPath>
+
+    <g clip-path="url(#cut-off1)">
+        <circle cx="135" cy="140" r="130" stroke="black" stroke-width="3" fill="white" />
+    </g>
+    <line x1="0" y1="0" x2="-110" y2="0" transform="translate(135 140) rotate(0)" stroke="blue" stroke-width="0.5" />
+    <line x1="0" y1="0" x2="-110" y2="0" transform="translate(135 140) rotate(12)" stroke="blue" stroke-width="0.5" />
+    <line x1="0" y1="0" x2="-110" y2="0" transform="translate(135 140) rotate(24)" stroke="blue" stroke-width="0.5" />
+    <line x1="0" y1="0" x2="-110" y2="0" transform="translate(135 140) rotate(36)" stroke="blue" stroke-width="0.5" />
+    <line x1="0" y1="0" x2="-110" y2="0" transform="translate(135 140) rotate(48)" stroke="blue" stroke-width="0.5" />
+    <line x1="0" y1="0" x2="-110" y2="0" transform="translate(135 140) rotate(60)" stroke="blue" stroke-width="0.5" />
+    <line x1="0" y1="0" x2="-110" y2="0" transform="translate(135 140) rotate(-12)" stroke="blue" stroke-width="0.5" />
+    <line x1="0" y1="0" x2="-110" y2="0" transform="translate(135 140) rotate(-24)" stroke="blue" stroke-width="0.5" />
+    <line x1="0" y1="0" x2="-110" y2="0" transform="translate(135 140) rotate(-36)" stroke="blue" stroke-width="0.5" />
+    <line x1="0" y1="0" x2="-110" y2="0" transform="translate(135 140) rotate(-48)" stroke="blue" stroke-width="0.5" />
+    <line x1="0" y1="0" x2="-110" y2="0" transform="translate(135 140) rotate(-60)" stroke="blue" stroke-width="0.5" />
+
+
+
+    <circle cx="135" cy="140" r="60" stroke="black" stroke-width="3" fill="grey" />
+
+    <g id="valveValue" stroke="red" stroke-width="3" transform="translate(135 140) rotate(-90)">
+        <line x1="0" y1="0" x2="-100" y2="0"  />
+        <line x1="-100" y1="0" x2="-93" y2="-5"  />
+        <line x1="-100" y1="0" x2="-93" y2="5"  />
+    </g>
+
+    <g font-size="16px">
+        <text x="6" y="145" transform="rotate(60 135 140)">10</text>
+        <text x="12" y="145" transform="rotate(48 135 140)">9</text>
+        <text x="12" y="145" transform="rotate(36 135 140)">8</text>
+        <text x="12" y="145" transform="rotate(24 135 140)">7</text>
+        <text x="12" y="145" transform="rotate(12 135 140)">6</text>
+        <text x="12" y="145" transform="rotate(0 135 140)">5</text>
+        <text x="12" y="145" transform="rotate(-12 135 140)">4</text>
+        <text x="12" y="145" transform="rotate(-24 135 140)">3</text>
+        <text x="12" y="145" transform="rotate(-36 135 140)">2</text>
+        <text x="12" y="145" transform="rotate(-48 135 140)">1</text>
+        <text x="12" y="145" transform="rotate(-60 135 140)">0</text>
+    </g>
+</svg>

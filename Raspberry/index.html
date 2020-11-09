@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/index.css?20200214">
+    <title>Zdalne sterowanie systemem C.O. w domu</title>
+</head>
+<body onload="refreshData()">
+
+<div class="title">Ogrzewanie ☺</div>
+
+<div class="date_now">
+    <span id="date_now"></span>
+</div>
+
+<button id="refreshButton" onclick="refreshData()">Odśwież</button>
+
+<object id="thermometerSvg" type="image/svg+xml" data="thermometer.svg"></object>
+
+<object id="valveSvg" type="image/svg+xml" data="valve.svg"></object>
+
+<button id="sendConfigDataButton" onclick="sendConfigData()">Wyślij</button>
+
+<div class="setup">
+    <input type="radio" id="chooseAutoMode" name="chooseMode">
+    <label for="newTempSet">Temperatura:</label>
+    <input type="range" style="width: 80%;" id="newTempSet" min="18" max="25" step="0.2" oninput="showValueOfRange(this.value, 'newTempSetValue')">
+    <span id="newTempSetValue"></span>
+</div>
+
+<div class="setup">
+    <input type="radio" id="chooseManualMode" name="chooseMode">
+    <label for="newValveSet">Nastawa zaworu:</label>
+    <input type="range" style="width: 80%;" id="newValveSet" min="0" max="10" step="0.5" oninput="showValueOfRange(this.value, 'newValveSetValue')">
+    <span id="newValveSetValue"></span>
+</div>
+
+<div class="readTemperature">Temperatura w domu: <span id="temperature_now"></span></div>
+
+<div class="setTemperature">Ustawiona temperatura: <span id="temperature_set"></span></div>
+
+<div class="readValveSetting">Pozycja zaworu: <span id="pid_status"></span></div>
+
+<div class="readMode"><span id="manual_mode"></span></div>
+
+<button id="showAdvanced" onclick="showAdvanced()">Zaawansowane</button>
+
+<hr>
+
+<div id="advanced">
+    <div class="date">Data ostatniego odczytu danych: <span id="dataDate"></span></div>
+
+    <div class="date">Data ostatniej odpowiedzi układu: <span id="confirmed"></span></div>
+
+    <div class="readValveSettingManualMode">Ustawiona pozycja zaworu w trybie ręcznym: <span id="pid_set"></span></div>
+
+    <label for="kpValue">Parametr kp: </label>
+    <input type="number" id="kpValue" min="0" max="50" step="1"><br>
+
+    <label for="kiValue">Parametr ki: </label>
+    <input type="number" id="kiValue" min="0" max="10000" step="1"><br>
+
+    <label for="kdValue">Parametr kd: </label>
+    <input type="number" id="kdValue" min="0" max="100" step="1"><br>
+</div>
+
+<script>
+    setInterval(function () {
+        let d = new Date();
+        document.getElementById("date_now").innerHTML = d.toLocaleTimeString();
+    }, 1000);
+
+    function refreshData() {
+        let xhttp;
+        xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                showRefreshedData(this);
+            }
+        };
+        xhttp.open("GET", "/PHPs/readDB.php", true);
+        xhttp.send();
+    }
+
+    setInterval(refreshData, 60000);
+
+    function showRefreshedData(xhttp) {
+        let obj = JSON.parse(xhttp.responseText);
+        document.getElementById("dataDate").innerText = obj.dateData;
+        document.getElementById("confirmed").innerText = obj.confirmed;
+        document.getElementById("temperature_now").innerText = obj.temperature_now + "°C";
+        document.getElementById("temperature_set").innerText = obj.temperature_set + "°C";
+        document.getElementById("newTempSet").value = obj.temperature_setDB;
+        document.getElementById("newTempSetValue").textContent = obj.temperature_setDB + "°C";
+        document.getElementById("pid_status").innerText = obj.pid_status;
+        document.getElementById("pid_set").innerText = obj.pid_set;
+        document.getElementById("newValveSet").value = obj.pid_set;
+        document.getElementById("newValveSetValue").textContent = obj.pid_set;
+        if (obj.manual_mode == "1") {
+            document.getElementById("manual_mode").innerText = "Tryb ręczny";
+            document.getElementById("chooseManualMode").checked = true;
+        }
+        if (obj.manual_mode == "0") {
+            document.getElementById("manual_mode").innerText = "Tryb automatyczny";
+            document.getElementById("chooseAutoMode").checked = true;
+        }
+        document.getElementById("kpValue").value = obj.kp;
+        document.getElementById("kiValue").value = obj.ki;
+        document.getElementById("kdValue").value = obj.kd;
+
+        let tempValue = "translate(0," + -((obj.temperature_set - 18.0)*30.0) + ")";
+        let offsetValue = ((obj.temperature_now - 18.0)*100/7.0) + "%";
+        let valveValue = "translate(135 140) rotate(" + (obj.pid_status*12.0 - 60.0) + ")";
+        document.getElementById("thermometerSvg").getSVGDocument().getElementById("setTemp").setAttribute("transform", tempValue);
+        document.getElementById("thermometerSvg").getSVGDocument().getElementById("setTempValue").textContent = obj.temperature_set + "°C";
+        document.getElementById("thermometerSvg").getSVGDocument().getElementById("currentTempPercent").setAttribute("offset", offsetValue);
+        document.getElementById("valveSvg").getSVGDocument().getElementById("valveValue").setAttribute("transform", valveValue);
+    }
+
+    function showValueOfRange(val, textName) {
+        document.getElementById(textName).textContent = val;
+    }
+
+    function showAdvanced() {
+        document.getElementById("advanced").style.display = "block";
+    }
+
+    function sendConfigData() {
+        let kp = parseInt(document.getElementById("kpValue").value);
+        let ki = parseInt(document.getElementById("kiValue").value);
+        let kd = parseInt(document.getElementById("kdValue").value);
+        let temperatureSet = parseFloat(document.getElementById("newTempSet").value);
+        let PIDSet = parseFloat(document.getElementById("newValveSet").value);
+        let manualMode;
+        if (document.getElementById("chooseManualMode").checked)
+            manualMode = 1;
+        else if (document.getElementById("chooseAutoMode").checked)
+            manualMode = 0;
+        let request = "kp=" + kp + "&ki=" + ki + "&kd=" + kd + "&temperature_set=" + temperatureSet + "&PID_set=" + PIDSet + "&manual_mode=" + manualMode;
+        let xhttp;
+        xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                if (this.responseText === "OK written config data")
+                    alert("Dane zatwierdzone do przesłania");
+                else
+                    alert("Coś poszło nie tak...");
+            }
+        };
+        xhttp.open("POST", "/PHPs/setConfigDB.php", true);
+        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhttp.send(request);
+    }
+</script>
+</body>
+</html>
